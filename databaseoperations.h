@@ -42,15 +42,15 @@ public:
 
     QString RetrieveEntryFromDatabase(int rowId);
 
-    bool DeleteFromDatabase(int rowId);
+    bool DeleteEntryFromDatabase(int rowId);
 
-    bool SaveToDatabase(QString entry);
+    bool SaveEntryToDatabase(QString entry);
 
-    QList<EntryMetadataEntity> RetrieveList(QDateTime fromWhen);
+    QList<EntryMetadataEntity> RetrieveEntryList(QDateTime fromWhen);
 
-    static QByteArray EncryptString(QString input, QByteArray EncKey);
+    QByteArray EncryptString(QString input, QByteArray EncKey);
 
-    static QString DecryptString(QByteArray data, QByteArray DecKey);
+    QString DecryptString(QByteArray data, QByteArray DecKey);
 
     bool RunQuery(QString Query);
 
@@ -60,15 +60,29 @@ public:
 
     bool IsPreferencesSet();
 
+    bool IsPasswordValid(QString password);
+
 private:
     QSqlDatabase DB;
 
+    QByteArray m_Hash;
+
+    QByteArray HashString(QString password);
+    QString m_Title;
+    QString m_TimeStamp;
+
 public:
     QByteArray m_CurrentKey;
-    QString m_Title;
     QString m_Entry;
     int m_Id;
-    QString m_TimeStamp;
+    QString CurrentTitle()
+    {
+        return m_Title;
+    }
+    QString CurrentTimestamp()
+    {
+        return m_TimeStamp;
+    }
 };
 
 #endif // DATABASEOPERATIONS_H

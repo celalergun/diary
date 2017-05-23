@@ -86,14 +86,14 @@ QString DatabaseOperations::RetrieveEntryFromDatabase(int rowId)
     return m_Entry;
 }
 
-bool DatabaseOperations::DeleteFromDatabase(int rowId)
+bool DatabaseOperations::DeleteEntryFromDatabase(int rowId)
 {
     QSqlQuery Q("Delete From Diary Where Id = :Id;", DB);
     Q.bindValue(0, rowId);
     return Q.exec();
 }
 
-bool DatabaseOperations::SaveToDatabase(QString entry)
+bool DatabaseOperations::SaveEntryToDatabase(QString entry)
 {
     m_Entry = entry;
     QByteArray arr = EncryptString(entry, m_CurrentKey);
@@ -103,7 +103,7 @@ bool DatabaseOperations::SaveToDatabase(QString entry)
     return Q.exec();
 }
 
-QList<EntryMetadataEntity> DatabaseOperations::RetrieveList(QDateTime fromWhen)
+QList<EntryMetadataEntity> DatabaseOperations::RetrieveEntryList(QDateTime fromWhen)
 {
     QList<EntryMetadataEntity> result;
     QSqlQuery Q("Select Id, Timestamp, Title From Diary Where Timestamp >= :Timestamp Order By Timestamp DESC;", DB);
@@ -129,11 +129,16 @@ QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
 {
     QByteArray result = input.toUtf8();
     int keyIndex = 0;
+    QCryptographicHash hasher(QCryptographicHash::Sha512);
+    hasher.addData(m_Hash);
+    hasher.addData(EncKey);
+    QByteArray key = hasher.result();
+
     for (int i = 0; i < result.count(); ++i)
     {
-        result[i] = result[i] ^ EncKey[keyIndex];
+        result[i] = result[i] ^ key[keyIndex];
         keyIndex++;
-        if (keyIndex == EncKey.count())
+        if (keyIndex == key.count())
             keyIndex = 0;
     }
     return result;
@@ -143,11 +148,16 @@ QString DatabaseOperations::DecryptString(QByteArray data, QByteArray DecKey)
 {
     QByteArray temp = data;
     int keyIndex = 0;
+    QCryptographicHash hasher(QCryptographicHash::Sha512);
+    hasher.addData(m_Hash);
+    hasher.addData(DecKey);
+    QByteArray key = hasher.result();
+
     for (int i = 0; i < temp.count(); ++i)
     {
-        temp[i] = temp[i] ^ DecKey[keyIndex];
+        temp[i] = temp[i] ^ key[keyIndex];
         keyIndex++;
-        if (keyIndex == DecKey.count())
+        if (keyIndex == key.count())
             keyIndex = 0;
     }
     QString result = QString::fromUtf8(temp);
@@ -174,11 +184,7 @@ int DatabaseOperations::EntryCount()
 
 bool DatabaseOperations::SetEncryption(bool useEncryption, QString password)
 {
-    QCryptographicHash hasher(QCryptographicHash::Sha512);
-    QByteArray arr = password.toUtf8();
-    hasher.addData(arr);
-
-    QByteArray hash = hasher.result();
+    QByteArray hash = HashString(password);
 
     if (useEncryption)
     {
@@ -200,5 +206,31 @@ bool DatabaseOperations::IsPreferencesSet()
 
     Q.next();
     return (Q.value("NumRows").toInt() > 0);
+}
+
+bool DatabaseOperations::IsPasswordValid(QString password)
+{
+    QSqlQuery Q("Select PasswordHash From Preferences;", DB);
+    if (!Q.exec())
+    {
+        throw "Cannot read preferences";
+    }
+
+    Q.next();
+    QByteArray Original = Q.value("PasswordHash").toByteArray();
+    if (Original.count() != 64)
+    {
+        throw "Configuration error. Password hash must be 512 bits";
+    }
+    m_Hash = HashString(password);
+    return (Original == m_Hash);
+}
+
+QByteArray DatabaseOperations::HashString(QString password)
+{
+    QCryptographicHash hasher(QCryptographicHash::Sha512);
+    QByteArray arr = password.toUtf8();
+    hasher.addData(arr);
+    return hasher.result();
 }
 

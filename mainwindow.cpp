@@ -39,6 +39,15 @@ MainWindow::MainWindow(QWidget *parent) :
             }
         }
     }
+    else
+    {
+        bool ok;
+        QString pass1 = QInputDialog::getText(this, "Password",
+                                             "Please enter your password", QLineEdit::Password,
+                                             "", &ok);
+        if (!DbOp.IsPasswordValid(pass1))
+            exit(0);
+    }
 //    QByteArray key = QString("123456789").toUtf8();
 //    QString test = "Pijamalı hasta yağız şoföre çabucak güvendi";
 //    QByteArray arr = DatabaseOperations::EncryptString(test, key);
@@ -71,7 +80,7 @@ void MainWindow::on_actionQuit_triggered()
 void MainWindow::on_textEdit_textChanged()
 {
     if (!m_Dirty)
-        ui->statusBar->setWindowTitle("* Modified");
+        ui->statusBar->showMessage("* Modified");
 
     m_Dirty = true;
 }
@@ -79,7 +88,7 @@ void MainWindow::on_textEdit_textChanged()
 void MainWindow::DisplayRecord(int rowId)
 {
     QString entry = DbOp.RetrieveEntryFromDatabase(rowId);
-    QString title = DbOp.m_Title + " - " + DbOp.m_TimeStamp;
+    QString title = DbOp.CurrentTitle() + " - " + DbOp.CurrentTimestamp();
     this->setWindowTitle(title);
     ui->textEdit->setPlainText(entry);
     ui->textEdit->setFocus();
@@ -102,25 +111,25 @@ void MainWindow::on_actionNew_entry_triggered()
             return;
 
         DisplayRecord(rowId);
-        ui->statusBar->setWindowTitle("New entry created...");
+        ui->statusBar->showMessage("New entry created...");
     }
 }
 
 void MainWindow::on_actionSave_triggered()
 {
     QString entry = ui->textEdit->toPlainText();
-    if (!DbOp.SaveToDatabase(entry))
+    if (!DbOp.SaveEntryToDatabase(entry))
     {
         QMessageBox(QMessageBox::Critical, "Error", "Cannot save entry to the database: ", QMessageBox::Ok).exec();
         return;
     }
     m_Dirty = false;
-    ui->statusBar->setWindowTitle("Saved.");
+    ui->statusBar->showMessage("Saved.");
 }
 
 void MainWindow::on_actionDelete_triggered()
 {
-    if (!DbOp.DeleteFromDatabase(DbOp.m_Id))
+    if (!DbOp.DeleteEntryFromDatabase(DbOp.m_Id))
     {
         QMessageBox(QMessageBox::Critical, "Error", "Cannot delete entry from the database: ", QMessageBox::Ok).exec();
         return;
@@ -128,14 +137,14 @@ void MainWindow::on_actionDelete_triggered()
     ui->textEdit->clear();
     ui->textEdit->setReadOnly(true);
     m_Dirty = false;
-    ui->statusBar->setWindowTitle("Deleted!");
+    ui->statusBar->showMessage("Deleted!");
 }
 
 void MainWindow::on_actionSelect_a_previous_entry_to_read_edit_triggered()
 {
     EntryList* el = new EntryList(this);
 
-    auto list = DbOp.RetrieveList(QDateTime::fromString("2017-01-01", "yyyy-MM-dd"));
+    auto list = DbOp.RetrieveEntryList(QDateTime::fromString("2017-01-01", "yyyy-MM-dd"));
 
     for (int i = 0; i<list.count();i++)
     {
@@ -151,5 +160,5 @@ void MainWindow::on_actionSelect_a_previous_entry_to_read_edit_triggered()
         return;
 
     DisplayRecord(rowId);
-    ui->statusBar->setWindowTitle("Loaded...");
+    ui->statusBar->showMessage("Loaded...");
 }
