@@ -19,6 +19,12 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QTextEdit" name="textEdit">
+        <property name="font">
+         <font>
+          <family>Verdana</family>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
         <property name="readOnly">
          <bool>true</bool>
         </property>

@@ -129,7 +129,7 @@ QList<EntryMetadataEntity> DatabaseOperations::RetrieveEntryList(QDateTime fromW
 QByteArray ReduceKey(QByteArray LongKey)
 {
     QByteArray result;
-    result.fill(0xCC, 16);
+    result.fill((char)0xCC, 16);
     for (int i = 0; i < LongKey.count(); ++i)
     {
         result[i % 16] = result[i % 16] ^ LongKey[i];
@@ -144,23 +144,37 @@ QByteArray DatabaseOperations::StretchKey(QByteArray UserKey)
     hasher.addData(UserKey);
     QByteArray Key = hasher.result();
 
-    return Key;
+    return ReduceKey(Key);
 }
 
 QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
 {
-    QByteArray Key = StretchKey(EncKey);
+    if (m_UseEncryption)
+    {
+        QByteArray Key = StretchKey(EncKey);
 
-    AesClass enc;
-    return enc.Encrypt(input.toUtf8(), ReduceKey(Key));
+        AesClass enc;
+        return enc.Encrypt(input.toUtf8(), Key);
+    }
+    else
+    {
+        return input.toUtf8();
+    }
 }
 
 QString DatabaseOperations::DecryptString(QByteArray input, QByteArray DecKey)
 {
-    QByteArray Key = StretchKey(DecKey);
+    if (m_UseEncryption)
+    {
+        QByteArray Key = StretchKey(DecKey);
 
-    AesClass dec;
-    return QString::fromUtf8(dec.Decrypt(input, ReduceKey(Key)));
+        AesClass dec;
+        return QString::fromUtf8(dec.Decrypt(input, Key));
+    }
+    else
+    {
+        return QString::fromUtf8(input);
+    }
 }
 
 bool DatabaseOperations::RunQuery(QString Query)
@@ -181,9 +195,9 @@ int DatabaseOperations::EntryCount()
     return Q.value("NumRows").toInt();
 }
 
-bool DatabaseOperations::SetEncryption(bool useEncryption, QString password)
+bool DatabaseOperations::SetEncryption(bool useEncryption, QString password, QStringList fileList)
 {
-    QByteArray hash = HashString(password);
+    QByteArray hash = HashString(password, fileList);
 
     if (useEncryption)
     {
@@ -207,7 +221,26 @@ bool DatabaseOperations::IsPreferencesSet()
     return (Q.value("NumRows").toInt() > 0);
 }
 
-bool DatabaseOperations::IsPasswordValid(QString password)
+void DatabaseOperations::ReadPreferences()
+{
+    QSqlQuery Q("Select UseEncryption, PasswordHash From Preferences;", DB);
+    if (!Q.exec())
+    {
+        throw "Cannot get row count";
+    }
+
+    Q.next();
+    m_UseEncryption = Q.value("UseEncryption").toBool();
+    m_MasterPasswordHash = Q.value("PasswordHash").toByteArray();
+    return;
+}
+
+bool DatabaseOperations::IsPasswordEnabled()
+{
+    return m_UseEncryption;
+}
+
+bool DatabaseOperations::IsPasswordValid(QString password, QStringList fileList)
 {
     QSqlQuery Q("Select PasswordHash From Preferences;", DB);
     if (!Q.exec())
@@ -221,15 +254,28 @@ bool DatabaseOperations::IsPasswordValid(QString password)
     {
         throw "Configuration error. Password hash must be 512 bits";
     }
-    m_MasterPasswordHash = HashString(password);
-    return (Original == m_MasterPasswordHash);
+    return (Original == HashString(password, fileList));
 }
 
-QByteArray DatabaseOperations::HashString(QString password)
+QByteArray DatabaseOperations::HashString(QString password, QStringList fileList)
 {
     QCryptographicHash hasher(QCryptographicHash::Sha512);
-    QByteArray arr = password.toUtf8();
-    hasher.addData(arr);
+    QByteArray passHash = password.toUtf8();
+    hasher.addData(passHash);
+
+    QByteArray fileBuf(1024, (char)0xCC);
+
+    for (int i = 0; i < fileList.count(); ++i)
+    {
+        QFile file(fileList.at(i));
+        file.open(QIODevice::ReadOnly);
+        QByteArray buffer = file.read(1024);
+        for (int j = 0; j < buffer.count(); ++j)
+        {
+            fileBuf[j] = fileBuf[j] ^ buffer[j];
+        }
+    }
+    hasher.addData(fileBuf);
     return hasher.result();
 }
 

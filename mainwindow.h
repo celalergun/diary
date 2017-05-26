@@ -14,6 +14,7 @@
 #include "databaseoperations.h"
 #include "entrylist.h"
 #include "aesclass.h"
+#include "logindialog.h"
 
 namespace Ui {
 class MainWindow;

@@ -44,32 +44,43 @@ MainWindow::MainWindow(QWidget *parent) :
                     "It seems like you have just installed this application. You can use a password to login when you start it. Do you want to use a password?",
                     QMessageBox::Yes | QMessageBox::No))
         {
-            bool ok;
-            QString pass1 = QInputDialog::getText(this, "Password",
-                                                 "Please enter your password", QLineEdit::Password,
-                                                 "", &ok);
-            QString pass2 = QInputDialog::getText(this, "Password",
-                                                 "Please enter your password again", QLineEdit::Password,
-                                                 "", &ok);
+            LoginDialog *login = new LoginDialog(this);
+            login->ShowPasswordVerifier();
+            int res = login->exec();
+            if (res == QDialog::Rejected)
+                exit(0);
+
+            QString pass1 = login->Password();
+            QString pass2 = login->Password2();
             if (pass1 != pass2)
             {
                 QMessageBox::critical(this, "Error", "Passwords do not match. Cannot set a password!", QMessageBox::Ok);
-                return;
+                exit(0);
             }
             else
             {
-                DbOp.SetEncryption(true, pass1);
+                DbOp.SetEncryption(true, pass1, login->Files());
             }
+        }
+        else
+        {
+            DbOp.SetEncryption(false, "", QStringList());
         }
     }
     else
     {
-        bool ok;
-        QString pass1 = QInputDialog::getText(this, "Password",
-                                             "Please enter your password", QLineEdit::Password,
-                                             "", &ok);
-        if (!DbOp.IsPasswordValid(pass1))
-            exit(0);
+        DbOp.ReadPreferences();
+        if (DbOp.IsPasswordEnabled())
+        {
+            LoginDialog *login = new LoginDialog(this);
+            int res = login->exec();
+            if ((res == QDialog::Rejected))
+                exit(0);
+            if (!DbOp.IsPasswordValid(login->Password(), login->Files()))
+                exit(0);
+
+            delete login;
+        }
     }
 }
 

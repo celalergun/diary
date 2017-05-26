@@ -49,6 +49,8 @@ public:
 
     QList<EntryMetadataEntity> RetrieveEntryList(QDateTime fromWhen);
 
+    QByteArray StretchKey(QByteArray EncKey);
+
     QByteArray EncryptString(QString input, QByteArray EncKey);
 
     QString DecryptString(QByteArray input, QByteArray DecKey);
@@ -57,20 +59,25 @@ public:
 
     int EntryCount();
 
-    bool SetEncryption(bool useEncryption, QString password);
+    bool SetEncryption(bool useEncryption, QString password, QStringList fileList);
 
     bool IsPreferencesSet();
 
-    bool IsPasswordValid(QString password);
+    bool IsPasswordValid(QString password, QStringList fileList);
+
+    void ReadPreferences();
+
+    bool IsPasswordEnabled();
 
 private:
     QSqlDatabase DB;
 
     QByteArray m_MasterPasswordHash;
 
-    QByteArray HashString(QString password);
+    QByteArray HashString(QString password, QStringList fileList);
     QString m_Title;
     QString m_TimeStamp;
+    bool m_UseEncryption;
 
 public:
     QByteArray m_CurrentKey;

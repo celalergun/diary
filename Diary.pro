@@ -28,16 +28,19 @@ SOURCES += main.cpp\
     databaseoperations.cpp \
     entrylist.cpp \
     aesclass.cpp \
-    tiny-AES128-C/aes.c
+    tiny-AES128-C/aes.c \
+    logindialog.cpp
 
 HEADERS  += mainwindow.h \
     databaseoperations.h \
     entrylist.h \
     aesclass.h \
-    tiny-AES128-C/aes.h
+    tiny-AES128-C/aes.h \
+    logindialog.h
 
 FORMS    += mainwindow.ui \
-    entrylist.ui
+    entrylist.ui \
+    logindialog.ui
 
 DISTFILES += \
     README.md
