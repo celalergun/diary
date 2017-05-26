@@ -14,6 +14,7 @@
 #include <QDateTime>
 #include <QObject>
 #include <QCryptographicHash>
+#include <aesclass.h>
 
 class EntryMetadataEntity
 {
@@ -50,7 +51,7 @@ public:
 
     QByteArray EncryptString(QString input, QByteArray EncKey);
 
-    QString DecryptString(QByteArray data, QByteArray DecKey);
+    QString DecryptString(QByteArray input, QByteArray DecKey);
 
     bool RunQuery(QString Query);
 
@@ -65,7 +66,7 @@ public:
 private:
     QSqlDatabase DB;
 
-    QByteArray m_Hash;
+    QByteArray m_MasterPasswordHash;
 
     QByteArray HashString(QString password);
     QString m_Title;

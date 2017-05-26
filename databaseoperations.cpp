@@ -125,43 +125,38 @@ QList<EntryMetadataEntity> DatabaseOperations::RetrieveEntryList(QDateTime fromW
     return result;
 }
 
-QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
+// reduces 512 bits hash to 128 bits key because our AES library is 128 bits
+QByteArray ReduceKey(QByteArray LongKey)
 {
-    QByteArray result = input.toUtf8();
-    int keyIndex = 0;
-    QCryptographicHash hasher(QCryptographicHash::Sha512);
-    hasher.addData(m_Hash);
-    hasher.addData(EncKey);
-    QByteArray key = hasher.result();
-
-    for (int i = 0; i < result.count(); ++i)
+    QByteArray result;
+    result.fill(0xCC, 16);
+    for (int i = 0; i < LongKey.count(); ++i)
     {
-        result[i] = result[i] ^ key[keyIndex];
-        keyIndex++;
-        if (keyIndex == key.count())
-            keyIndex = 0;
+        result[i % 16] = result[i % 16] ^ LongKey[i];
     }
     return result;
 }
 
-QString DatabaseOperations::DecryptString(QByteArray data, QByteArray DecKey)
+QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
 {
-    QByteArray temp = data;
-    int keyIndex = 0;
     QCryptographicHash hasher(QCryptographicHash::Sha512);
-    hasher.addData(m_Hash);
-    hasher.addData(DecKey);
-    QByteArray key = hasher.result();
+    hasher.addData(m_MasterPasswordHash);
+    hasher.addData(EncKey);
+    QByteArray Key = hasher.result();
 
-    for (int i = 0; i < temp.count(); ++i)
-    {
-        temp[i] = temp[i] ^ key[keyIndex];
-        keyIndex++;
-        if (keyIndex == key.count())
-            keyIndex = 0;
-    }
-    QString result = QString::fromUtf8(temp);
-    return result;
+    AesClass enc;
+    return enc.Encrypt(input.toUtf8(), ReduceKey(Key));
+}
+
+QString DatabaseOperations::DecryptString(QByteArray input, QByteArray DecKey)
+{
+    QCryptographicHash hasher(QCryptographicHash::Sha512);
+    hasher.addData(m_MasterPasswordHash);
+    hasher.addData(DecKey);
+    QByteArray Key = hasher.result();
+
+    AesClass dec;
+    return QString::fromUtf8(dec.Decrypt(input, ReduceKey(Key)));
 }
 
 bool DatabaseOperations::RunQuery(QString Query)
@@ -222,8 +217,8 @@ bool DatabaseOperations::IsPasswordValid(QString password)
     {
         throw "Configuration error. Password hash must be 512 bits";
     }
-    m_Hash = HashString(password);
-    return (Original == m_Hash);
+    m_MasterPasswordHash = HashString(password);
+    return (Original == m_MasterPasswordHash);
 }
 
 QByteArray DatabaseOperations::HashString(QString password)

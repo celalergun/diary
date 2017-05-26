@@ -13,6 +13,7 @@
 
 #include "databaseoperations.h"
 #include "entrylist.h"
+#include "aesclass.h"
 
 namespace Ui {
 class MainWindow;

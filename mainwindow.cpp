@@ -1,6 +1,21 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+QString testEncrypt()
+{
+    AesClass enc;
+    QByteArray key = QString("1234567890123456").toUtf8();
+    QString test;
+    for (int i = 0; i < 100; ++i) {
+        test = test + "Pijamalı hasta yağız şoföre çabucak güvendi ";
+    }
+    QByteArray arr = enc.Encrypt(test.toUtf8(), key);
+    QByteArray res = enc.Decrypt(arr, key);
+    test = QString::fromUtf8(res);
+    return test;
+}
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -9,6 +24,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->textEdit->setReadOnly(true);
     ui->menuEntry->setEnabled(false);
     m_Dirty = false;
+
+    //setWindowTitle(testEncrypt());
+
     DbOp = DatabaseOperations();
     if (!DbOp.Connect("diary.db3"))
     {
@@ -19,7 +37,12 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     if (!DbOp.IsPreferencesSet())
     {
-        if (QMessageBox::Yes == QMessageBox::question(this, "Password usage", "It seems like you have just installed this application. You can use a password to login when you start it. Do you want to use a password?", QMessageBox::Yes | QMessageBox::No))
+        if (QMessageBox::Yes ==
+                QMessageBox::question(
+                    this,
+                    "Password usage",
+                    "It seems like you have just installed this application. You can use a password to login when you start it. Do you want to use a password?",
+                    QMessageBox::Yes | QMessageBox::No))
         {
             bool ok;
             QString pass1 = QInputDialog::getText(this, "Password",
@@ -48,11 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
         if (!DbOp.IsPasswordValid(pass1))
             exit(0);
     }
-//    QByteArray key = QString("123456789").toUtf8();
-//    QString test = "Pijamalı hasta yağız şoföre çabucak güvendi";
-//    QByteArray arr = DatabaseOperations::EncryptString(test, key);
-//    test = DatabaseOperations::DecryptString(arr, key);
-//    setWindowTitle(test);
 }
 
 MainWindow::~MainWindow()

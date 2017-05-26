@@ -26,11 +26,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     databaseoperations.cpp \
-    entrylist.cpp
+    entrylist.cpp \
+    aesclass.cpp \
+    tiny-AES128-C/aes.c
 
 HEADERS  += mainwindow.h \
     databaseoperations.h \
-    entrylist.h
+    entrylist.h \
+    aesclass.h \
+    tiny-AES128-C/aes.h
 
 FORMS    += mainwindow.ui \
     entrylist.ui
