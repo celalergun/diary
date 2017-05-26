@@ -1,6 +1,6 @@
 # diary
 A very basic diary application written in C++ and Qt. It keeps its data in an SQLite database. 
-Encrypts the text only to keep it safe from your 9 year old sister.
+~~Encrypts the text only to keep it safe from your 9 year old sister.~~ It uses AES-128 with password stretching.
 
 Some people may not want a login screen and some may not want even the basic encryption.
 I added an option to keep the diary unencrypted.
