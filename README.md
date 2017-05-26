@@ -11,5 +11,6 @@ Entry key is automatically produced by SQLite during the entry creation. Every e
 
 Now it is using AES 128 bit encryption (https://github.com/kokke/tiny-AES128-C). I just used SHA512 hash + user's password hash as entry key. Reduced 512 bit hash to 128 bit key.
 
-TODO: I will process key files just like Veracrypt.
-This option keeps the data much more safer because keyloggers can record your keyboard but cannot know which jpeg or mp3 files you use to encrypt the data.
+Added key files support just like Veracrypt. This option keeps the data much more safer because keyloggers can record your keyboard but cannot know which jpeg or mp3 files you use to encrypt the data.
+Key files can be in any order. Please not that first 1024 bytes of a key file is used and must not be changed. Carefully select your key files. You can use pictures, music files etc. as well as they are not modified.
+
