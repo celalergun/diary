@@ -137,12 +137,19 @@ QByteArray ReduceKey(QByteArray LongKey)
     return result;
 }
 
-QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
+QByteArray DatabaseOperations::StretchKey(QByteArray UserKey)
 {
     QCryptographicHash hasher(QCryptographicHash::Sha512);
     hasher.addData(m_MasterPasswordHash);
-    hasher.addData(EncKey);
+    hasher.addData(UserKey);
     QByteArray Key = hasher.result();
+
+    return Key;
+}
+
+QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
+{
+    QByteArray Key = StretchKey(EncKey);
 
     AesClass enc;
     return enc.Encrypt(input.toUtf8(), ReduceKey(Key));
@@ -150,10 +157,7 @@ QByteArray DatabaseOperations::EncryptString(QString input, QByteArray EncKey)
 
 QString DatabaseOperations::DecryptString(QByteArray input, QByteArray DecKey)
 {
-    QCryptographicHash hasher(QCryptographicHash::Sha512);
-    hasher.addData(m_MasterPasswordHash);
-    hasher.addData(DecKey);
-    QByteArray Key = hasher.result();
+    QByteArray Key = StretchKey(DecKey);
 
     AesClass dec;
     return QString::fromUtf8(dec.Decrypt(input, ReduceKey(Key)));
