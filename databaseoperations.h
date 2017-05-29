@@ -74,7 +74,7 @@ private:
 
     QByteArray m_MasterPasswordHash;
 
-    QByteArray HashString(QString password, QStringList fileList);
+    QByteArray CalculateHash(QString password, QStringList fileList);
     QString m_Title;
     QString m_TimeStamp;
     bool m_UseEncryption;

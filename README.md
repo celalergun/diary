@@ -1,6 +1,6 @@
 # diary
 A very basic diary application written in C++ and Qt. It keeps its data in an SQLite database. 
-~~Encrypts the text only to keep it safe from your 9 year old sister.~~ It uses AES-128 with password stretching  (github.com/kokke/tiny-AES128-C). I just used SHA512 hash of user's password and hash of entry key as the encryption key. I reduced 512 bit SHA hash to 128 bit AES key since the algorithm uses 128 keys.
+~~Encrypts the text only to keep it safe from your 9 year old sister.~~ It uses AES-128 with password stretching  (github.com/kokke/tiny-AES128-C). I just used SHA512 hash of user's password and hash of entry key as the encryption key. I reduced 512 bit SHA hash to 128 bit AES key since the algorithm uses 128 bit keys.
 
 If you supply a password, program will use it to encrypt entries. You may choose not to encrypt the entries. If you use password and keyfiles, protect them because if you forget your password or lost your key files you may say your diary goodbye.
 
@@ -11,5 +11,5 @@ Some people may not want a login screen and some may not want even the basic enc
 I added an option to keep the diary unencrypted. Just say "No" to the question on first run.
 
 Finally I added key files support just like Veracrypt. This option keeps the data much more safer because keyloggers can record your keyboard but cannot know which jpeg or mp3 files you use to encrypt the data.
-Key files can be in any order. Please not that first 1024 bytes of a key file is used and must not be changed. Carefully select your key files and make a backup of these files. You can use pictures, music files etc. as well as they are not modified.
+Key files can be in any order. Please note that first 1024 bytes of a key file is used and must not be changed. Carefully select your key files and make a backup of these files. You can use pictures, music files etc. as well as they are not modified.
 

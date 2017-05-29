@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
             {
                 DbOp.SetEncryption(true, pass1, login->Files());
             }
+            delete login;
         }
         else
         {
@@ -130,7 +131,7 @@ void MainWindow::on_actionNew_entry_triggered()
 {
     bool ok;
     QString text = QInputDialog::getText(this, "Title of the day",
-                                         "What is it all about today?", QLineEdit::Normal,
+                                         "What was it all about today?", QLineEdit::Normal,
                                          "Subject", &ok);
     if (ok && !text.isEmpty())
     {

@@ -197,7 +197,7 @@ int DatabaseOperations::EntryCount()
 
 bool DatabaseOperations::SetEncryption(bool useEncryption, QString password, QStringList fileList)
 {
-    QByteArray hash = HashString(password, fileList);
+    QByteArray hash = CalculateHash(password, fileList);
 
     if (useEncryption)
     {
@@ -254,20 +254,25 @@ bool DatabaseOperations::IsPasswordValid(QString password, QStringList fileList)
     {
         throw "Configuration error. Password hash must be 512 bits";
     }
-    return (Original == HashString(password, fileList));
+    return (Original == CalculateHash(password, fileList));
 }
 
-QByteArray DatabaseOperations::HashString(QString password, QStringList fileList)
+QByteArray DatabaseOperations::CalculateHash(QString password, QStringList fileList)
 {
     QCryptographicHash hasher(QCryptographicHash::Sha512);
     QByteArray passHash = password.toUtf8();
-    hasher.addData(passHash);
+    for (int i = 0; i < 655331; ++i)
+    {
+        hasher.addData(passHash);
+    }
 
     QByteArray fileBuf(1024, (char)0xCC);
 
     for (int i = 0; i < fileList.count(); ++i)
     {
         QFile file(fileList.at(i));
+        if (file.size() < 1024)
+            throw "File(s) cannot be smaller than 1 kilobytes";
         file.open(QIODevice::ReadOnly);
         QByteArray buffer = file.read(1024);
         for (int j = 0; j < buffer.count(); ++j)
