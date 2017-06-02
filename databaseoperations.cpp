@@ -275,22 +275,6 @@ bool DatabaseOperations::IsPasswordValid(QString password, QStringList fileList)
 QByteArray DatabaseOperations::CalculateHash(QString password, QStringList fileList, bool forEntryCoding)
 {
     QCryptographicHash hasher(QCryptographicHash::Sha512);
-    QByteArray passHash = password.toUtf8();
-    if (forEntryCoding)
-    {
-        for (int i = 0; i < 655331; ++i)
-        {
-            hasher.addData(passHash);
-        }
-    }
-    else
-    {
-        for (int i = 0; i < 655321; ++i)
-        {
-            hasher.addData(passHash);
-        }
-    }
-
     QByteArray fileBuf(1024, (char)0xCC);
 
     for (int i = 0; i < fileList.count(); ++i)
@@ -305,7 +289,24 @@ QByteArray DatabaseOperations::CalculateHash(QString password, QStringList fileL
             fileBuf[j] = fileBuf[j] ^ buffer[j];
         }
     }
-    hasher.addData(fileBuf);
+
+    QByteArray passHash = password.toUtf8();
+    if (forEntryCoding)
+    {
+        hasher.addData(fileBuf);
+        for (int i = 0; i < 655331; ++i)
+        {
+            hasher.addData(passHash);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 655321; ++i)
+        {
+            hasher.addData(passHash);
+        }
+        hasher.addData(fileBuf);
+    }
     return hasher.result();
 }
 
