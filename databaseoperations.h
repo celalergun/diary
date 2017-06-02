@@ -69,12 +69,14 @@ public:
 
     bool IsPasswordEnabled();
 
+    void SetMasterPasswordHash(QString password, QStringList fileList);
+
 private:
     QSqlDatabase DB;
 
     QByteArray m_MasterPasswordHash;
 
-    QByteArray CalculateHash(QString password, QStringList fileList);
+    QByteArray CalculateHash(QString password, QStringList fileList, bool forEntryCoding);
     QString m_Title;
     QString m_TimeStamp;
     bool m_UseEncryption;

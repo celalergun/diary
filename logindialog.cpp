@@ -10,6 +10,7 @@ LoginDialog::LoginDialog(QWidget *parent) :
     ui->btnSelectFiles->setVisible(false);
     ui->lblAgain->setVisible(false);
     ui->editPassword_2->setVisible(false);
+    ui->editPassword->setFocus();
 }
 
 LoginDialog::~LoginDialog()
@@ -34,7 +35,7 @@ QStringList LoginDialog::Files()
 
 void LoginDialog::on_btnSelectFiles_clicked()
 {
-    QStringList filenames = QFileDialog::getOpenFileNames(this,tr("All files"),QDir::currentPath(),tr("All files (*.*);") );
+    QStringList filenames = QFileDialog::getOpenFileNames(this,tr("All files"),QDir::homePath(),tr("All files (*.*);") );
     if( !filenames.isEmpty() )
     {
         for (int i =0;i<filenames.count();i++)

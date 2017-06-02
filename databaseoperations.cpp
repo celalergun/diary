@@ -197,15 +197,25 @@ int DatabaseOperations::EntryCount()
 
 bool DatabaseOperations::SetEncryption(bool useEncryption, QString password, QStringList fileList)
 {
-    QByteArray hash = CalculateHash(password, fileList);
+    QByteArray hash;
 
     if (useEncryption)
     {
+        hash = CalculateHash(password, fileList, false);
         QSqlQuery Q("Replace Into Preferences (UseEncryption, PasswordHash) Values (:useEncryption, :hash);", DB);
         Q.bindValue(0, useEncryption);
         Q.bindValue(1, hash);
         return Q.exec();
     }
+    else
+    {
+        hash = (0);
+        QSqlQuery Q("Replace Into Preferences (UseEncryption, PasswordHash) Values (:useEncryption, :hash);", DB);
+        Q.bindValue(0, useEncryption);
+        Q.bindValue(1, hash);
+        return Q.exec();
+    }
+
     return false;
 }
 
@@ -240,6 +250,11 @@ bool DatabaseOperations::IsPasswordEnabled()
     return m_UseEncryption;
 }
 
+void DatabaseOperations::SetMasterPasswordHash(QString password, QStringList fileList)
+{
+    m_MasterPasswordHash = CalculateHash(password, fileList, true);
+}
+
 bool DatabaseOperations::IsPasswordValid(QString password, QStringList fileList)
 {
     QSqlQuery Q("Select PasswordHash From Preferences;", DB);
@@ -254,16 +269,26 @@ bool DatabaseOperations::IsPasswordValid(QString password, QStringList fileList)
     {
         throw "Configuration error. Password hash must be 512 bits";
     }
-    return (Original == CalculateHash(password, fileList));
+    return (Original == CalculateHash(password, fileList, false));
 }
 
-QByteArray DatabaseOperations::CalculateHash(QString password, QStringList fileList)
+QByteArray DatabaseOperations::CalculateHash(QString password, QStringList fileList, bool forEntryCoding)
 {
     QCryptographicHash hasher(QCryptographicHash::Sha512);
     QByteArray passHash = password.toUtf8();
-    for (int i = 0; i < 655331; ++i)
+    if (forEntryCoding)
     {
-        hasher.addData(passHash);
+        for (int i = 0; i < 655331; ++i)
+        {
+            hasher.addData(passHash);
+        }
+    }
+    else
+    {
+        for (int i = 0; i < 655321; ++i)
+        {
+            hasher.addData(passHash);
+        }
     }
 
     QByteArray fileBuf(1024, (char)0xCC);

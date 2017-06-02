@@ -7,9 +7,6 @@ EntryList::EntryList(QWidget *parent) :
 {
     ui->setupUi(this);
     List = QList<Entry>();
-//    ui->tableWidget->insertColumn(0);
-//    ui->tableWidget->insertColumn(1);
-//    ui->tableWidget->insertColumn(2);
     ui->tableWidget->setColumnCount(3);
     QStringList labels;
     labels << "Id" << "Title" << "Date";

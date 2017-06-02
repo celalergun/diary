@@ -108,6 +108,12 @@
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>editPassword</tabstop>
+  <tabstop>editPassword_2</tabstop>
+  <tabstop>chkUseKeyFiles</tabstop>
+  <tabstop>btnSelectFiles</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
