@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) :
         {
             DbOp.SetEncryption(false, "", QStringList());
         }
+        DbOp.ReadPreferences();
     }
     else
     {

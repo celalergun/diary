@@ -1,12 +1,12 @@
 #include "aesclass.h"
 
-AesClass::AesClass()
-{
-}
-
-int Div2Ceil(int x, int y)
+int AesClass::Div2Ceil(int x, int y)
 {
     return ((x + y - 1) / y);
+}
+
+AesClass::AesClass()
+{
 }
 
 const uint32_t KEYSIZE = 16;

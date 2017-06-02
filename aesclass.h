@@ -9,10 +9,12 @@ extern "C"
 
 class AesClass
 {
+private:
+    static int Div2Ceil(int x, int y);
 public:
     AesClass();
-    QByteArray Encrypt(QByteArray Source, QByteArray Key);
-    QByteArray Decrypt(QByteArray Source, QByteArray Key);
+    static QByteArray Encrypt(QByteArray Source, QByteArray Key);
+    static QByteArray Decrypt(QByteArray Source, QByteArray Key);
 };
 
 #endif // AESCLASS_H

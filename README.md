@@ -1,6 +1,6 @@
 # diary
 A very basic diary application written in C++ and Qt. It keeps its data in an SQLite database. 
-~~Encrypts the text only to keep it safe from your 9 year old sister.~~ It uses AES-128 with password stretching  (github.com/kokke/tiny-AES128-C). I just used SHA512 hash of user's password and hash of entry key as the encryption key. I reduced 512 bit SHA hash to 128 bit AES key since the algorithm uses 128 bit keys.
+It uses AES-128 with password stretching (https://www.github.com/kokke/tiny-AES128-C.html). I just used SHA512 hash of user's password and hash of entry key as the encryption key. I reduced 512 bit SHA hash to 128 bit AES key since the algorithm uses 128 bit keys.
 
 If you supply a password, program will use it to encrypt entries. You may choose not to encrypt the entries. If you use password and keyfiles, protect them because if you forget your password or lost your key files you may say your diary goodbye.
 
