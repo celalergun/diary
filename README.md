@@ -14,3 +14,5 @@ Please note that first 1024 bytes of a key file is used and must not be changed.
 
 Some people may not want a login screen and some may not want even the basic encryption.
 I added an option to keep the diary unencrypted. Just say "No" to the question on first run.
+
+TODO: I will add a password changing option. It would be nice to change your password time to time.
