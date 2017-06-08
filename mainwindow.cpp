@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDesktopWidget>
 
 QString testEncrypt()
 {
@@ -46,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
         {
             LoginDialog *login = new LoginDialog(this);
             login->ShowPasswordVerifier();
+            login->move(QApplication::desktop()->screen()->rect().center() - login->rect().center());
             int res = login->exec();
             if (res == QDialog::Rejected)
                 exit(0);
@@ -75,6 +77,7 @@ MainWindow::MainWindow(QWidget *parent) :
         if (DbOp.IsPasswordEnabled())
         {
             LoginDialog *login = new LoginDialog(this);
+            login->move(QApplication::desktop()->screen()->rect().center() - login->rect().center());
             int res = login->exec();
             if ((res == QDialog::Rejected))
                 exit(0);
