@@ -12,7 +12,7 @@ Entry key is automatically produced by SQLite during the entry creation. Every e
 
 Please note that first 1024 bytes of a key file is used and must not be changed. Carefully select your key files and make a backup of these files. You can use pictures, music files etc. as well as they are not modified.
 
-Some people may not want a login screen and some may not want even the basic encryption.
+Some people may not want a login screen and some may not even want the basic encryption.
 I added an option to keep the diary unencrypted. Just say "No" to the question on first run.
 
-TODO: I will add a password changing option. It would be nice to change your password time to time.
+TODO: I will add a password changing option. It would be nice to change your password from time to time.
