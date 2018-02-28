@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->textEdit->setReadOnly(true);
         ui->menuDiary->setEnabled(false);
         ui->menuEntry->setEnabled(false);
-        QMessageBox::critical(this, "Error", "Couldn't create database", QMessageBox::Ok);
+        QMessageBox::critical(this, "Error", "Couldn't create the database", QMessageBox::Ok);
     }
     if (!DbOp.IsPreferencesSet())
     {
