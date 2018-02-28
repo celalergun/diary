@@ -99,7 +99,7 @@ void MainWindow::closeEvent(QCloseEvent *event)  // show prompt when user wants 
     if (m_Dirty)
     {
         event->ignore();
-        if (QMessageBox::Yes == QMessageBox::question(this, "Exit?", "You changed your text and not saved it yet. Are you sure?", QMessageBox::Yes | QMessageBox::No))
+        if (QMessageBox::Yes == QMessageBox::question(this, "Exit?", "You have changed your text and not saved it yet. Are you sure?", QMessageBox::Yes | QMessageBox::No))
         {
             event->accept();
         }
